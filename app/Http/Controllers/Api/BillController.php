@@ -7,6 +7,7 @@ use App\Models\Bill;
 use App\Models\Customers;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class BillController extends Controller
@@ -98,19 +99,35 @@ class BillController extends Controller
 
             if(Customers::where('account_number',$number)->count() > 0){
 
-                $res = Bill::where('account_number',"$number");
+                // $res = Bill::where('account_number',"$number");
+                $res = DB::table('bill')
+                        // ->select('bill.account_number,bill.units,bill.date,account.customer_name')
+                        ->join('account','account.account_number','=','bill.account_number')
+                        ->join('users','users.id','=','bill.read_by')
+                        ->where('bill.account_number',$number)
+                        ->orderByDesc('bill.date')
+                        ->get([
+                            'bill.account_number',
+                            'account.customer_name',
+                            'bill.date',
+                            'bill.id',
+                            'users.name',
+                            'bill.units',
+                            'bill.created_at'
+                        ]);
 
                 $billData = [];
 
                 for ($i=$request->offset; $i < $request->limit; $i++) { 
-                    array_push($billData,$res->get()[$i]);
+                    array_push($billData,$res[$i]);
                 }
 
                 return response()->json([
                     "status"=>true,
                     "total_bills"=>$res->count(),
                     "bills"=>sizeof($billData),
-                    "bill_data"=>$billData
+                    "bill_data"=>$billData,
+                    "msg"=>($res->count() > 1)? "{$res->count()} Bills Found" : "{$res->count()} Bill Found"
                 ]);
 
             }else{
