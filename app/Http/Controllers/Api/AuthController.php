@@ -39,7 +39,7 @@ class AuthController extends Controller
                 
                 return response()->json([
                     "status"=>true,
-                    "msg"=>"Successfully Registered User {$request->name}",
+                    "message"=>"Successfully Registered User {$request->name}",
                     "token"=>[
                         "token"=>$token,
                         "token_type"=>"Bearer"
@@ -49,7 +49,7 @@ class AuthController extends Controller
             }else{
                 return response()->json([
                     "status"=>false,
-                    "msg"=>"Failed to Register User {$request->name}"
+                    "message"=>"Failed to Register User {$request->name}"
                 ]);
             }
 
@@ -71,23 +71,18 @@ class AuthController extends Controller
                 
             return response()->json([
                 "status"=>true,
-                "msg"=>"Successfully Registered User {$request->name}",
+                "message"=>"Login Success.",
                 "token"=>[
                     "token"=>$token,
                     "token_type"=>"Bearer"
                 ]
             ]); 
 
-            return response()->json([
-                "status"=>true,
-                "msg"=>"Login Succeed"
-            ]);
-
         }else{
 
             return response()->json([
                 "status"=>false,
-                "msg"=>"Failed to Login"
+                "message"=>"Failed to Login. Email or Password is Invalid"
             ]);
 
         }
@@ -96,5 +91,11 @@ class AuthController extends Controller
 
     public function me(Request $request){
         return $request->user();
+    }
+
+    public function getcsrf(Request $request){
+        return response()->json([
+            "csrf"=>csrf_token()
+        ]);
     }
 }

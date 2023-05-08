@@ -39,13 +39,13 @@ class BillController extends Controller
                             return response()->json([
                                 "status"=>true,
                                 "err"=>null,
-                                "msg"=>'Successfully Saved the Bill.'
+                                "message"=>'Successfully Saved the Bill.'
                             ]);
                         }else{
                             return response()->json([
                                 "status"=>false,
                                 "err"=>null,
-                                "msg"=>'Failed to Save the Bill.'
+                                "message"=>'Failed to Save the Bill.'
                             ]);
                         }
 
@@ -54,7 +54,7 @@ class BillController extends Controller
                         return response()->json([
                             "status"=>false,
                             "err"=>null,
-                            "msg"=>'Already Saved the Bill.'
+                            "message"=>'Already Saved the Bill.'
                         ]);
 
                     }
@@ -64,7 +64,7 @@ class BillController extends Controller
                     return response()->json([
                         "status"=>false,
                         "err"=>null,
-                        "msg"=>'Invalid Customer Account Number.',
+                        "message"=>'Invalid Customer Account Number.',
                         'req'=>$request->all()
                     ]);
                 }
@@ -72,7 +72,7 @@ class BillController extends Controller
                 return response()->json([
                     "status"=>false,
                     "err"=>null,
-                    "msg"=>'Invalid User',
+                    "message"=>'Invalid User',
                     'req'=>$request->all()
                 ]);
             }
@@ -82,7 +82,7 @@ class BillController extends Controller
             return response()->json([
                 "status"=>false,
                 "err"=>$validator->messages(),
-                'req'=>$request->all()
+
             ]);
         }
 
@@ -118,17 +118,28 @@ class BillController extends Controller
 
                 $billData = [];
 
-                for ($i=$request->offset; $i < $request->limit; $i++) { 
-                    array_push($billData,$res[$i]);
+                if($res->count() > 0){
+                    for ($i=$request->offset; $i < $request->limit; $i++) { 
+                        array_push($billData,$res[$i]);
+                    }
+    
+                    return response()->json([
+                        "status"=>true,
+                        "total_bills"=>$res->count(),
+                        "bills"=>sizeof($billData),
+                        "bill_data"=>$billData,
+                        "msg"=>($res->count() > 1)? "{$res->count()} Bills Found" : "{$res->count()} Bill Found"
+                    ]);
+                }else{
+                    return response()->json([
+                        "status"=>false,
+                        "total_bills"=>$res->count(),
+                        "bills"=>sizeof($billData),
+                        "bill_data"=>null,
+                        "msg"=>"You Don't Have received any bills yet"
+                    ]);
                 }
 
-                return response()->json([
-                    "status"=>true,
-                    "total_bills"=>$res->count(),
-                    "bills"=>sizeof($billData),
-                    "bill_data"=>$billData,
-                    "msg"=>($res->count() > 1)? "{$res->count()} Bills Found" : "{$res->count()} Bill Found"
-                ]);
 
             }else{
                 return response()->json([
@@ -144,5 +155,22 @@ class BillController extends Controller
             ]);
         }
 
+    }
+
+    public function calc($units){
+        $fixed = 0;
+        $f = 0;
+        $s = 0;
+        $t = 0;
+        $total = 0;
+
+        if(30 >= $units){
+            $fixed = 500;
+            $f = $units * 20;
+            return $f + $fixed;   
+        }elseif(30 < $units && $units <= 90){
+            $m = (($units - 30) / 30);
+            return $m;
+        }
     }
 }

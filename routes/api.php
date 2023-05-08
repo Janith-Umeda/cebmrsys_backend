@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);
+Route::post('csrf',[AuthController::class,'getcsrf']);
 Route::get('bill/{number}',[BillController::class,"findBill"]);
 
 Route::middleware('auth:sanctum')->group( function () {
