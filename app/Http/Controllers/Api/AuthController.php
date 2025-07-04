@@ -22,7 +22,8 @@ class AuthController extends Controller
 
             return response()->json([
                 "status"=>false,
-                "errors"=>$validator->messages()
+                "errors"=>$validator->messages(),
+                "message"=>"Failed to Register User. Please check your input."
             ]);
 
         }else{
@@ -36,7 +37,7 @@ class AuthController extends Controller
             if($res){
 
                 $token = $res->createToken('auth_token')->plainTextToken;
-                
+
                 return response()->json([
                     "status"=>true,
                     "message"=>"Successfully Registered User {$request->name}",
@@ -44,7 +45,7 @@ class AuthController extends Controller
                         "token"=>$token,
                         "token_type"=>"Bearer"
                     ]
-                ]); 
+                ]);
 
             }else{
                 return response()->json([
@@ -68,7 +69,7 @@ class AuthController extends Controller
             $user = User::where('email',$request->email)->firstOrFail();
 
             $token = $user->createToken('auth_token')->plainTextToken;
-                
+
             return response()->json([
                 "status"=>true,
                 "message"=>"Login Success.",
@@ -76,7 +77,7 @@ class AuthController extends Controller
                     "token"=>$token,
                     "token_type"=>"Bearer"
                 ]
-            ]); 
+            ]);
 
         }else{
 
